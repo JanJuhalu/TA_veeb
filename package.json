@@ -1,0 +1,29 @@
+{
+  "name": "ta_veeb_juhalu",
+  "version": "1.0.0",
+  "description": "Tarkvraarendamise esimese kursse veeb, made by man",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://JanJuhalu@github.com/JanJuhalu/TA_veeb.git"
+  },
+  "keywords": [
+    "õppetöö",
+    "node.js",
+    "express.js",
+    "tallinna",
+    "ülikool"
+  ],
+  "author": "Jan Marken Juhalu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JanJuhalu/TA_veeb/issues"
+  },
+  "homepage": "https://github.com/JanJuhalu/TA_veeb#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
