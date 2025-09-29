@@ -18,8 +18,8 @@ app.get("/", (req, res)=>{
 });
 
 app.get("/timenow", (req, res)=>{
-    const weekDayNow = dateET.weekDay();
-    const dateNow = dateET.dateNow();
+    const weekDayNow = dateET.weekDayET();
+    const dateNow = dateET.fullDate();
     res.render("timenow", {weekDayNow: weekDayNow, dateNow: dateNow});
 
 });
