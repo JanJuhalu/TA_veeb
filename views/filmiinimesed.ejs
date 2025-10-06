@@ -5,19 +5,26 @@
   <title>Uus algus, veebiprogrammeerimine</title>
 </head>
 <body>
-  <img src="image/vp_banner_2025_TA.jpg" alt="kursuse banner">
+  <img src="../image/vp_banner_2025_TA.jpg" alt="kursuse banner">
   <h1>Jan Marken Juhalu, esimene tund</h1>
   <p>Seda tundi õpetas Andrus Rinde ja seda ma kirjutan <a href="https://www.tlu.ee">Tallinna Ülikoolis</a>, sest ma olen nimedega mega halb</p>
   <hr>
   <p>Kirjtasin seda teksti kohe peale seda kuima selle kodust valmissain. Kui enda kohta midagi lisada siis ma lisaks et mulle meeldib rahvatants ja jõusaalis käia. Ja elu on keeruline</p>
   <hr>
   <ul>
-      <li><a href="/timenow">Ajainfo</a></li>
-      <li><a href="/vanasonad">Vanasõnad</a></li>
-      <li><a href="/regvisit">Pane oma külastus kirja</a></li>
-      <li> <a href="/visitlog">Vaata külastusi</a></li>
-      <li><a href="/eestiFilm">Vaata eesti filme</a></li>
+      <li><a href="/">Avaleht</a></li>
+      <li><a href="/eestiFilm">Eesi filmi avaleht</a></li>
   </ul>
+  <hr>
+  <h2>Eesti filmiinimesed</h2>
+  <ol>
+    <% personList.forEach(function(listItem){ %>
+      <li><%= listItem.first_name  %> <%= listItem.last_name  %>, sündinud <%= listItem.born  %></li>
+
+    <% }); %>
+
+  </ol>
+   
 
   <!-- -->
 
