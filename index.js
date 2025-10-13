@@ -26,12 +26,7 @@ app.use(bodyparser.urlencoded({extended: false}));
     database: dbInfo.configData.dataBase
 });*/
 
-const dbConf = {
-    host: dbInfo.configData.host,
-    user: dbInfo.configData.user,
-    password: dbInfo.configData.passWord,
-    database: dbInfo.configData.dataBase
-}
+
 
 app.get("/", (req, res)=>{
     //res.send("Express.js läks käima ja serveerib veebi");
@@ -172,6 +167,10 @@ app.post("/eestiFilm/filmiinimesed_add", async (req, res)=> {
         }
     }
 });
+
+//Esti filmi marsuudid
+const eestifilmRouter = require("./routes/eestifilmRoutes");
+app.use("/eestiFilm", eestifilmRouter);
 
 /*app.post("/eestiFilm/filmiinimesed_add", (req, res)=>{ //POST ON SEE KUHU ANDMED TULEVAD
     console.log(req.body);
