@@ -6,7 +6,9 @@ const dbInfo = require("../../vp2025config");
 //käivitan js funktsiooni ja annan talle nimeks "app"
 const bodyparser = require("body-parser");
 //SQL andmebaasi moodul
-const mysql = require("mysql2");
+//const mysql = require("mysql2");
+//kuna kasutame asünkroonsust, siis importime mysql2/promise mooduli
+const mysql = require("mysql2/promise");
 const { hostname } = require("os");
 const app = express();
 //määran veebilehtede mallide renderdamise mootori
@@ -17,12 +19,19 @@ app.use(express.static("public"));
 app.use(bodyparser.urlencoded({extended: false}));
 
 //loon andmebaasi ühenduse
-const conn = mysql.createConnection({
+/*const conn = mysql.createConnection({
     host: dbInfo.configData.host,
     user: dbInfo.configData.user,
     password: dbInfo.configData.passWord,
     database: dbInfo.configData.dataBase
-});
+});*/
+
+const dbConf = {
+    host: dbInfo.configData.host,
+    user: dbInfo.configData.user,
+    password: dbInfo.configData.passWord,
+    database: dbInfo.configData.dataBase
+}
 
 app.get("/", (req, res)=>{
     //res.send("Express.js läks käima ja serveerib veebi");
@@ -104,23 +113,67 @@ app.get("/eestiFilm", (req, res)=>{
 
 });
 
-app.get("/eestiFilm/filmiinimesed", (req, res)=>{ 
+app.get("/eestiFilm/filmiinimesed", async (req, res)=>{
+    let conn;
     const sqlReq = "SELECT * FROM person";
-    conn.execute(sqlReq, (err, sqlres)=>{
-        if (err){
-            throw(err);
+    try {
+        conn = await mysql.createConnection(dbConf);
+        console.log("Andmebaasi ühenuds loodud");
+        const [rows, fields] = await conn.execute(sqlReq);
+        res.render("filmiinimesed", {personList: rows});
+    }
+    catch(err) {
+        console.log("Viga!" + err);
+        res.render("filmiinimesed", {personList: []});
+    }
+    finally{
+        //paneme ühenduse kinni
+        if(conn/*connection*/){
+            await conn.end();
+                console.log("Andmebaasi ühenuds on suletud");
         }
-        else {
-            console.log(sqlres);
-            res.render("filmiinimesed", {personList: sqlres});
-        }
-    });
+    }
 });
+
+
 app.get("/eestiFilm/filmiinimesed_add", (req, res)=>{
     res.render("filmiinimesed_add", {notice: "Ootan sisestust"}); 
 
 });
-app.post("/eestiFilm/filmiinimesed_add", (req, res)=>{ //POST ON SEE KUHU ANDMED TULEVAD
+
+app.post("/eestiFilm/filmiinimesed_add", async (req, res)=> {
+    let conn;
+    let sqlReq = "INSERT INTO person (first_name, last_name, born, deceased) VALUES (?,?,?,?)";
+    
+    if(!req.body.firstNameInput || !req.body.lastNameInput || !req.body.bornInput || req.body.deceasedInput >= new Date ()){
+        res.render("filmiinimesed_add", {notice:"Osa andmeid olipuudu või ebakorrektsed"});
+    }
+    else {
+        try {
+            conn = await mysql.createConnection(dbConf);
+            console.log("Andmebaasi ühenuds loodud");
+            let deceasedDate = null;
+            if (req.body.deceasedInput != ""){
+                deceasedDate = req.body.deceasedInput;
+            }
+            const [result] = await conn.execute(sqlReq, [req.body.firstNameInput, req.body.lastNameInput, req.body.bornInput, deceasedDate]);
+            console.log("Salvestati kirje: " + result.insertId);//saame teada äsja lisatud kirje id
+            res.render("filmiinimesed_add", {notice:"Andmed salvestatud"});
+        }
+        catch(err) {
+            console.log("Viga!" + err);
+            res.render("filmiinimesed_add", {notice: " Inimese lisamine ebaõnestus"});
+        }
+        finally {
+            if(conn/*connection*/){
+            await conn.end();
+                console.log("Andmebaasi ühenuds on suletud");
+            }
+        }
+    }
+});
+
+/*app.post("/eestiFilm/filmiinimesed_add", (req, res)=>{ //POST ON SEE KUHU ANDMED TULEVAD
     console.log(req.body);
     //kas andmed on olemas
     if(!req.body.firstNameInput || !req.body.lastNameInput || !req.body.bornInput || req.body.deceasedInput >= new Date ()){
@@ -128,7 +181,7 @@ app.post("/eestiFilm/filmiinimesed_add", (req, res)=>{ //POST ON SEE KUHU ANDMED
     }
     else {
         let sqlReq = "INSERT INTO person (first_name, last_name, born, deceased) VALUES (?,?,?,?)";
-        conn.execute(sqlReq, [req.body.firstNameInput, req.body.lastNameInput, req.body.bornInput, req.body.deceasedInput], (err, sqlres)=>{
+        conn.execute(sqlReq, [req.body.firstNameInput, req.body.lastNameInput, req.body.bornInput, deceasedDate], (err, sqlres)=>{
             if(err){
                 res.render("filmiinimesed_add", {notice: " Inimese lisamine ebaõnestus"});
             }
@@ -139,7 +192,7 @@ app.post("/eestiFilm/filmiinimesed_add", (req, res)=>{ //POST ON SEE KUHU ANDMED
     }
     res.render("filmiinimesed_add"); 
 
-});
+});*/
 
 
 

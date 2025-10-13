@@ -5,7 +5,7 @@
   <title>Uus algus, veebiprogrammeerimine</title>
 </head>
 <body>
-  <img src="image/vp_banner_2025_TA.jpg" alt="kursuse banner">
+  <img src="../image/vp_banner_2025_TA.jpg" alt="kursuse banner">
   <h1>Jan Marken Juhalu, esimene tund</h1>
   <p>Seda tundi õpetas Andrus Rinde ja seda ma kirjutan <a href="https://www.tlu.ee">Tallinna Ülikoolis</a>, sest ma olen nimedega mega halb</p>
   <hr>
@@ -13,18 +13,20 @@
   <hr>
   <ul>
       <li><a href="/">Avaleht</a></li>
-    <li><a href="/eestiFilm">Eesi filmi avaleht</a></li>
+      <li><a href="/eestiFilm">Eesi filmi avaleht</a></li>
   </ul>
   <hr>
-  <h2>Eesti filmid</h2>
+  <h2>Ametid</h2>
   <ol>
-    <% personList.forEach(function(listItem){ %>
-      <li><%= listItem.  %></li>
-
+    <% positionList.forEach(function(listItem){ %>
+      <li><%= listItem.first_name  %> <%= listItem.last_name  %>, position  %></li>
+      
     <% }); %>
 
   </ol>
-  <!-- siia teha sama asi mis filmiinimesed ejs faiis -->
+   
+
+  <!-- -->
 
 </body>
 
