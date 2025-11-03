@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <title>Uus algus, veebiprogrammeerimine</title>
+</head>
+<body>
+  <img src="image/vp_banner_2025_TA.jpg" alt="kursuse banner">
+  <h1>Jan Marken Juhalu, esimene tund</h1>
+  <p>Seda tundi õpetas Andrus Rinde ja seda ma kirjutan <a href="https://www.tlu.ee">Tallinna Ülikoolis</a>, sest ma olen nimedega mega halb</p>
+  <hr>
+  <p>Kirjtasin seda teksti kohe peale seda kuima selle kodust valmissain. Kui enda kohta midagi lisada siis ma lisaks et mulle meeldib rahvatants ja jõusaalis käia. Ja elu on keeruline</p>
+  <hr>
+  <ul>
+      <li><a href="/">Avaleht</a></li>
+  </ul>
+  <hr>
+  <h2>Lae üles galeriifoto</h2>
+  <form method="POST" enctype="multipart/form-data"> 
+    <label for="photoInput">Vali soovitud pildifail: </label>
+    <input id="photoInput" name="photoInput" type="file">
+    <br>
+    <label for="altInput">Pildi alternatiivtekst: </label>
+    <input id="altInput" name="altInput" type="text" placeholder="Sellel pildil on ...">
+    <br>
+    <input id="privacyInput1" name="privacyInput" value="1" type="radio" checked>
+    <label for="privacyInput1">Privaatne</label>
+    <br>
+    <input id="privacyInput2" name="privacyInput" value="2" type="radio">
+    <label for="privacyInput2">Sisseloginud kasutajatele</label>
+    <br>
+    <input id="privacyInput3" name="privacyInput" value="3" type="radio">
+    <label for="privacyInput3">Avalik</label>
+    <br>
+    <input type="submit" id="photoSubmit" name="photoSubmit" value="Lae foto üles">
+
+  </form>
+  
+  <!-- -->
+
+</body>
+
+</html>

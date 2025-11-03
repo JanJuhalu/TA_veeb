@@ -16,7 +16,7 @@ app.set("view engine", "ejs");
 //määran ühe päris kataloogi kättesaadavaks
 app.use(express.static("public"));
 //parsime oäringu URL-i, lipp false, kui ainult tekst ja true, kui muid andmeid ka 
-app.use(bodyparser.urlencoded({extended: false}));
+app.use(bodyparser.urlencoded({extended: true}));
 
 //loon andmebaasi ühenduse
 /*const conn = mysql.createConnection({
@@ -193,6 +193,8 @@ app.use("/eestiFilm", eestifilmRouter);
 
 });*/
 
-
+//galerii fotode ülesalaadimine
+const photoupRouter = require("./routes/photoupRoutes");
+app.use("/foto_upload", photoupRouter);
 
 app.listen(5119);

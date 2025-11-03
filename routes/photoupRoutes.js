@@ -1,21 +1,16 @@
 const express = require("express");
+const multer = require("multer");
 const router = express.Router();
-
-
-
+//seadistame vajevara fotode üleslaadimiseks kindlasse kausta
+const uploader = multer({dest: "./public/gallery/orig/"});
+//kontrollerid
 const {
-    eestifilm,
-    filmiinimesed,
-    filmiinimesedAdd,
-    inimesedAddPost,
-    position
-} = require ("../controllers/eestifilmController");
+    photouploadPage,
+    photouploadPagePost} = require ("../controllers/photouploadController");
 
-router.route("/").get(eestifilm);
-router.route("/filmiinimesed").get(filmiinimesed);
-router.route("/filmiinimesed_add").get(filmiinimesedAdd);
-router.route("/filmiinimesed_add").post(inimesedAddPost);
-router.route("/position").get(position);
+router.route("/").get(photouploadPage);
+
+router.route("/").post(uploader.single("photoInput"), photouploadPagePost);
 
 module.exports = router;
 

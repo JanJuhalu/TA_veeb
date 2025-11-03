@@ -93,9 +93,34 @@ const dbConf = {
     }
 };
 
+//app.get("/eestiFilm/position", (req, res)=>{ 
+    const position = async (req, res)=>{
+    let conn;
+    const sqlReq = "SELECT * FROM position";
+    try{
+        conn = await mysql.createConnection(dbConf);
+            console.log("Andmebaasi ühenuds loodud");
+        const [rows, fields] = await conn.execute(sqlReq);
+        res.render("position", {positionList: rows});
+    }
+    catch(err) {
+        console.log(err);
+                res.render("position", {positionList: []});
+
+    }
+    finally{
+        if(conn){
+            await conn.end();
+                console.log("Andmebaasi ühenuds on suletud");
+            }
+    }
+    
+};
+
 module.exports = {
     eestifilm,
     filmiinimesed,
     filmiinimesedAdd,
-    inimesedAddPost
+    inimesedAddPost,
+    position
 }
