@@ -8,6 +8,12 @@ const {
     filmiinimesed,
     filmiinimesedAdd,
     inimesedAddPost,
+    positionAddPost,
+    filmAddPost,
+    relationsAddPost,
+    filmAddPage,
+    relationsAddPage,
+    relationsByPerson,
     position
 } = require ("../controllers/eestifilmController");
 
@@ -16,6 +22,13 @@ router.route("/filmiinimesed").get(filmiinimesed);
 router.route("/filmiinimesed_add").get(filmiinimesedAdd);
 router.route("/filmiinimesed_add").post(inimesedAddPost);
 router.route("/position").get(position);
+router.route("/position_add").get(positionAddPost);
+router.route("/position_add").post(positionAddPost);
+router.route("/position_add").post(filmAddPost);
+router.route("/position_add").post(relationsAddPost);
+router.route("/film_add").get(filmAddPage);
+router.route("/relations_add").get(relationsAddPage);
+router.route("/relations_by_person").get(relationsByPerson);
 
 module.exports = router;
 

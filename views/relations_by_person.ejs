@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <title>Uus algus, veebiprogrammeerimine</title>
+</head>
+<body>
+  <img src="../image/vp_banner_2025_TA.jpg" alt="kursuse banner">
+  <h1>Jan Marken Juhalu, esimene tund</h1>
+  <p>Seda tundi õpetas Andrus Rinde ja seda ma kirjutan <a href="https://www.tlu.ee">Tallinna Ülikoolis</a>, sest ma olen nimedega mega halb</p>
+  <hr>
+  <p>Kirjtasin seda teksti kohe peale seda kuima selle kodust valmissain. Kui enda kohta midagi lisada siis ma lisaks et mulle meeldib rahvatants ja jõusaalis käia. Ja elu on keeruline</p>
+  <hr>
+  <ul>
+      <li><a href="/">Avaleht</a></li>
+      <li><a href="/eestiFilm">Eesi filmi avaleht</a></li>
+  </ul>
+  <hr>
+  <h2>Seosed inimeste kaupa</h2>
+  <h1>Isikute, filmide ja ametite seosed</h1>
+
+  <% if (relations.length === 0) { %>
+    <p>Ühtegi seost pole veel lisatud.</p>
+  <% } else { %>
+    <table border="1" cellpadding="5">
+      <tr>
+        <th>Isik</th>
+        <th>Film</th>
+        <th>Amet</th>
+        <th>Roll</th>
+      </tr>
+      <% relations.forEach(r => { %>
+        <tr>
+          <td><%= r.first_name %> <%= r.last_name %></td>
+          <td><%= r.title %></td>
+          <td><%= r.position_name %></td>
+          <td><%= r.role || "" %></td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } %>
+
+  <p><a href="/eestiFilm/relations_add">Lisa uus seos</a></p>
+  <p><a href="/eestiFilm">Tagasi Eesti filmi avalehele</a></p>
+</body>
+</html>

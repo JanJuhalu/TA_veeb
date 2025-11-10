@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <title>Uus algus, veebiprogrammeerimine</title>
+</head>
+<body>
+  <img src="../image/vp_banner_2025_TA.jpg" alt="kursuse banner">
+  <h1>Jan Marken Juhalu, esimene tund</h1>
+  <p>Seda tundi õpetas Andrus Rinde ja seda ma kirjutan <a href="https://www.tlu.ee">Tallinna Ülikoolis</a>, sest ma olen nimedega mega halb</p>
+  <hr>
+  <p>Kirjtasin seda teksti kohe peale seda kuima selle kodust valmissain. Kui enda kohta midagi lisada siis ma lisaks et mulle meeldib rahvatants ja jõusaalis käia. Ja elu on keeruline</p>
+  <hr>
+  <ul>
+      <li><a href="/">Avaleht</a></li>
+      <li><a href="/eestiFilm">Eesi filmi avaleht</a></li>
+  </ul>
+  <hr>
+  <h1>Lisa uus film</h1>
+
+  <form method="POST" action="/eestiFilm/film_add">
+    <label for="titleInput">Filmi pealkiri:</label>
+    <input type="text" id="titleInput" name="titleInput" required><br>
+
+    <label for="yearInput">Tootmisaasta:</label>
+    <input type="number" id="yearInput" name="yearInput" min="1888" required><br>
+
+    <label for="durationInput">Kestus (min):</label>
+    <input type="number" id="durationInput" name="durationInput"><br>
+
+    <label for="descriptionInput">Kirjeldus:</label><br>
+    <textarea id="descriptionInput" name="descriptionInput" rows="4" cols="40"></textarea><br>
+
+    <button type="submit">Lisa film</button>
+  </form>
+
+  <p><%= notice %></p>
+  <p><a href="/eestiFilm">Tagasi Eesti filmi avalehele</a></p>
+</body>
+</html>

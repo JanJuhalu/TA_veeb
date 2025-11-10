@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <title>Uus algus, veebiprogrammeerimine</title>
+</head>
+<body>
+  <img src="../image/vp_banner_2025_TA.jpg" alt="kursuse banner">
+  <h1>Jan Marken Juhalu, esimene tund</h1>
+  <p>Seda tundi õpetas Andrus Rinde ja seda ma kirjutan <a href="https://www.tlu.ee">Tallinna Ülikoolis</a>, sest ma olen nimedega mega halb</p>
+  <hr>
+  <p>Kirjtasin seda teksti kohe peale seda kuima selle kodust valmissain. Kui enda kohta midagi lisada siis ma lisaks et mulle meeldib rahvatants ja jõusaalis käia. Ja elu on keeruline</p>
+  <hr>
+  <ul>
+      <li><a href="/">Avaleht</a></li>
+      <li><a href="/eestiFilm">Eesi filmi avaleht</a></li>
+  </ul>
+  <hr>
+  <h2>Lisa seos</h2>
+  <h1>Loo seos inimese, filmi ja ameti vahel</h1>
+
+  <form method="POST" action="/eestiFilm/relations_add">
+    <label for="personSelect">Vali isik:</label>
+    <select id="personSelect" name="personSelect" required>
+      <option selected disabled>Vali isik</option>
+      <% people.forEach(p => { %>
+        <option value="<%= p.id %>"><%= p.first_name %> <%= p.last_name %></option>
+      <% }) %>
+    </select><br><br>
+
+    <label for="filmSelect">Vali film:</label>
+    <select id="filmSelect" name="filmSelect" required>
+      <option selected disabled>Vali film</option>
+      <% films.forEach(f => { %>
+        <option value="<%= f.id %>"><%= f.title %></option>
+      <% }) %>
+    </select><br><br>
+
+    <label for="positionSelect">Vali amet:</label>
+    <select id="positionSelect" name="positionSelect" required>
+      <option selected disabled>Vali amet</option>
+      <% positions.forEach(pos => { %>
+        <option value="<%= pos.id %>"><%= pos.position_name %></option>
+      <% }) %>
+    </select><br><br>
+
+    <label for="roleInput">Roll (kui näitleja):</label>
+    <input type="text" id="roleInput" name="roleInput"><br><br>
+
+    <button type="submit">Lisa seos</button>
+  </form>
+
+  <p><%= notice %></p>
+  <p><a href="/eestiFilm/relations_by_person">Vaata olemasolevaid seoseid</a></p>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <title>Uus algus, veebiprogrammeerimine</title>
+</head>
+<body>
+  <img src="../image/vp_banner_2025_TA.jpg" alt="kursuse banner">
+  <h1>Jan Marken Juhalu, esimene tund</h1>
+  <p>Seda tundi õpetas Andrus Rinde ja seda ma kirjutan <a href="https://www.tlu.ee">Tallinna Ülikoolis</a>, sest ma olen nimedega mega halb</p>
+  <hr>
+  <p>Kirjtasin seda teksti kohe peale seda kuima selle kodust valmissain. Kui enda kohta midagi lisada siis ma lisaks et mulle meeldib rahvatants ja jõusaalis käia. Ja elu on keeruline</p>
+  <hr>
+  <ul>
+      <li><a href="/">Avaleht</a></li>
+      <li><a href="/eestiFilm">Eesi filmi avaleht</a></li>
+  </ul>
+  <hr>
+  <h2>Ameti lisamine</h2>
+  <h1>Lisa uus amet</h1>
+
+  <form method="POST" action="/eestiFilm/position_add">
+    <label for="positionNameInput">Ameti nimetus:</label>
+    <input type="text" id="positionNameInput" name="positionNameInput" required>
+    <button type="submit">Lisa</button>
+  </form>
+
+  <p><%= notice %></p>
+
+  <p><a href="/eestiFilm/position">Tagasi ametite nimekirja</a></p>
+</body>
+</html>

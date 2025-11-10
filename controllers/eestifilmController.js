@@ -31,6 +31,12 @@ const dbConf = {
         conn = await mysql.createConnection(dbConf);
         console.log("Andmebaasi ühenuds loodud");
         const [rows, fields] = await conn.execute(sqlReq);
+
+        //vormindan kuupäevad ilusaks
+        rows.forEach(r => {
+            if (r.born) r.born = DataTransferItem.givenDateFormattedET(r.born);
+            if (r.deceased) r.deceased = DataTransferItem.givenDateFormattedET(r.deceased);
+        });
         res.render("filmiinimesed", {personList: rows});
     }
     catch(err) {
@@ -76,7 +82,12 @@ const dbConf = {
             if (req.body.deceasedInput != ""){
                 deceasedDate = req.body.deceasedInput;
             }
-            const [result] = await conn.execute(sqlReq, [req.body.firstNameInput, req.body.lastNameInput, req.body.bornInput, deceasedDate]);
+            const [result] = await conn.execute(sqlReq, [
+                req.body.firstNameInput, 
+                req.body.lastNameInput, 
+                req.body.bornInput, 
+                deceasedDate
+            ]);
             console.log("Salvestati kirje: " + result.insertId);//saame teada äsja lisatud kirje id
             res.render("filmiinimesed_add", {notice:"Andmed salvestatud"});
         }
@@ -94,33 +105,150 @@ const dbConf = {
 };
 
 //app.get("/eestiFilm/position", (req, res)=>{ 
-    const position = async (req, res)=>{
+    const position = async (req, res) => {
     let conn;
     const sqlReq = "SELECT * FROM position";
-    try{
+    try {
         conn = await mysql.createConnection(dbConf);
-            console.log("Andmebaasi ühenuds loodud");
-        const [rows, fields] = await conn.execute(sqlReq);
-        res.render("position", {positionList: rows});
-    }
-    catch(err) {
+        const [rows] = await conn.execute(sqlReq);
+        res.render("position", { positionList: rows, notice: "" });
+    } catch (err) {
         console.log(err);
-                res.render("position", {positionList: []});
-
+        res.render("position", { positionList: [], notice: "Ametite laadimine ebaõnnestus" });
+    } finally {
+        if (conn) await conn.end();
     }
-    finally{
-        if(conn){
-            await conn.end();
-                console.log("Andmebaasi ühenuds on suletud");
-            }
-    }
-    
 };
 
+const positionAddPost = async (req, res) => {
+    let conn;
+    if (!req.body.positionNameInput) {
+        return res.render("position_add", { notice: "Ametinimetus puudub" });
+    }
+
+    try {
+        conn = await mysql.createConnection(dbConf);
+        await conn.execute("INSERT INTO position (position_name) VALUES (?)", [req.body.positionNameInput]);
+        res.render("position_add", { notice: "Amet lisatud!" });
+    } catch (err) {
+        console.log(err);
+        res.render("position_add", { notice: "Lisamine ebaõnnestus" });
+    } finally {
+        if (conn) await conn.end();
+    }
+};
+
+//------------------------------------------------------------
+// 5. Filmide lisamine
+//------------------------------------------------------------
+const filmAddPage = (req, res) => {
+    res.render("film_add", { notice: "Lisa uus film" });
+};
+
+const filmAddPost = async (req, res) => {
+    let conn;
+    const sqlReq = "INSERT INTO film (title, production_year, duration, description) VALUES (?,?,?,?)";
+
+    if (!req.body.titleInput || !req.body.yearInput) {
+        return res.render("film_add", { notice: "Filmi nimi ja aasta on kohustuslikud" });
+    }
+
+    try {
+        conn = await mysql.createConnection(dbConf);
+        await conn.execute(sqlReq, [
+            req.body.titleInput,
+            req.body.yearInput,
+            req.body.durationInput || null,
+            req.body.descriptionInput || null
+        ]);
+        res.render("film_add", { notice: "Film lisatud!" });
+    } catch (err) {
+        console.log(err);
+        res.render("film_add", { notice: "Filmi lisamine ebaõnnestus" });
+    } finally {
+        if (conn) await conn.end();
+    }
+};
+
+//------------------------------------------------------------
+// 6. Isik–film–amet seoste lisamine ja kuvamine
+//------------------------------------------------------------
+const relationsAddPage = async (req, res) => {
+    let conn;
+    try {
+        conn = await mysql.createConnection(dbConf);
+
+        const [people] = await conn.execute("SELECT id, first_name, last_name FROM person");
+        const [films] = await conn.execute("SELECT id, title FROM film");
+        const [positions] = await conn.execute("SELECT id, position_name FROM position");
+
+        res.render("relations_add", {
+            people,
+            films,
+            positions,
+            notice: "Loo seos"
+        });
+    } catch (err) {
+        console.log(err);
+        res.render("relations_add", { people: [], films: [], positions: [], notice: "Viga andmete laadimisel" });
+    } finally {
+        if (conn) await conn.end();
+    }
+};
+
+const relationsAddPost = async (req, res) => {
+    let conn;
+    const sqlReq = "INSERT INTO person_in_film (person_id, film_id, position_id, role) VALUES (?,?,?,?)";
+    try {
+        conn = await mysql.createConnection(dbConf);
+        await conn.execute(sqlReq, [
+            req.body.personSelect,
+            req.body.filmSelect,
+            req.body.positionSelect,
+            req.body.roleInput || null
+        ]);
+        res.render("relations_add", { notice: "Seos lisatud!" });
+    } catch (err) {
+        console.log(err);
+        res.render("relations_add", { notice: "Seose lisamine ebaõnnestus" });
+    } finally {
+        if (conn) await conn.end();
+    }
+};
+
+const relationsByPerson = async (req, res) => {
+    let conn;
+    const sqlReq = `
+        SELECT p.first_name, p.last_name, f.title, pos.position_name, pf.role
+        FROM person_in_film pf
+        JOIN person p ON pf.person_id = p.id
+        JOIN film f ON pf.film_id = f.id
+        JOIN position pos ON pf.position_id = pos.id
+        ORDER BY p.last_name, p.first_name;
+    `;
+    try {
+        conn = await mysql.createConnection(dbConf);
+        const [rows] = await conn.execute(sqlReq);
+        res.render("relations_by_person", { relations: rows });
+    } catch (err) {
+        console.log(err);
+        res.render("relations_by_person", { relations: [] });
+    } finally {
+        if (conn) await conn.end();
+    }
+};
+
+//------------------------------------------------------------
 module.exports = {
     eestifilm,
     filmiinimesed,
     filmiinimesedAdd,
     inimesedAddPost,
-    position
-}
+    position,
+    positionAddPost,
+    filmAddPage,
+    filmAddPost,
+    relationsAddPage,
+    relationsAddPost,
+    relationsByPerson
+};

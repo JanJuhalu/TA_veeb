@@ -19,19 +19,43 @@ app.use(express.static("public"));
 app.use(bodyparser.urlencoded({extended: true}));
 
 //loon andmebaasi ühenduse
-/*const conn = mysql.createConnection({
+const dbConf = {
     host: dbInfo.configData.host,
     user: dbInfo.configData.user,
     password: dbInfo.configData.passWord,
     database: dbInfo.configData.dataBase
-});*/
+};
 
 
 
-app.get("/", (req, res)=>{
-    //res.send("Express.js läks käima ja serveerib veebi");
-    res.render("index");
+
+app.get("/", async (req, res)=>{
+	let conn;
+	try {
+		conn = await mysql.createConnection(dbConf);
+		let sqlReq = "SELECT file_name, alttext FROM uus WHERE id=(SELECT MAX(id) FROM uus WHERE privacy=? AND deleteit IS NULL)";
+		const privacy = 3;
+		const [rows, fields] = await conn.execute(sqlReq, [privacy]);
+		console.log(rows);
+		let imgAlt = "Avalik foto";
+		if(rows[0].alttext != ""){
+			imgAlt = rows[0].alttext;
+		}
+		res.render("index", {imgFile: "gallery/normal/" + rows[0].file_name, imgAlt: imgAlt});
+	}
+	catch(err){
+		console.log(err);
+		//res.render("index");
+		res.render("index", {imgFile: "images/otsin_pilte.jpg", imgAlt: "Tunnen end, kui pilti otsiv lammas ..."});
+	}
+	finally {
+		if(conn){
+			await conn.end();
+			console.log("AndmebaasiÃ¼hendus suletud!");
+		}
+	}
 });
+
 
 app.get("/timenow", (req, res)=>{
     const weekDayNow = dateET.weekDayET();
@@ -196,5 +220,8 @@ app.use("/eestiFilm", eestifilmRouter);
 //galerii fotode ülesalaadimine
 const photoupRouter = require("./routes/photoupRoutes");
 app.use("/foto_upload", photoupRouter);
+
+const galleyRouter = require("./routes/galleryRoutes");
+app.use("/photogallery", galleyRouter);
 
 app.listen(5119);
