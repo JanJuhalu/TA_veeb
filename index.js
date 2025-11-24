@@ -3,20 +3,24 @@ const fs = require ("fs");
 const textRef = "public/txt/vanasõnad.txt";
 const dateET = require("./src/dateTimeET");
 const dbInfo = require("../../vp2025config");
+const loginCheck = require("./src/checklogin");
 //käivitan js funktsiooni ja annan talle nimeks "app"
 const bodyparser = require("body-parser");
 //SQL andmebaasi moodul
 //const mysql = require("mysql2");
 //kuna kasutame asünkroonsust, siis importime mysql2/promise mooduli
 const mysql = require("mysql2/promise");
+const session = require("express-session");
 const { hostname } = require("os");
 const app = express();
+app.use(session({secret: dbInfo.configData.sessionSecret, saveUninitialized: true, resave: true}));
 //määran veebilehtede mallide renderdamise mootori
 app.set("view engine", "ejs");
 //määran ühe päris kataloogi kättesaadavaks
 app.use(express.static("public"));
 //parsime oäringu URL-i, lipp false, kui ainult tekst ja true, kui muid andmeid ka 
 app.use(bodyparser.urlencoded({extended: true}));
+
 
 //loon andmebaasi ühenduse
 const dbConf = {
@@ -55,6 +59,20 @@ app.get("/", async (req, res)=>{
 		}
 	}
 });
+
+//sisseloginud kasutajate osa avaleht
+app.get("/home", loginCheck.isLogin,  (req, res)=>{
+    console.log("Sisse logis kasutaja: " + req.session.userId);
+    res.render("home", {user: req.session.firstName + " " + req.session.lastName});
+});
+
+//välja logimine
+app.get("/logout", (req, res)=>{
+    //tühistame sessiooni
+    req.session.destroy
+    console.log("Välja logitud");
+    res.redirect("/");
+})
 
 
 app.get("/timenow", (req, res)=>{
@@ -217,11 +235,24 @@ app.use("/eestiFilm", eestifilmRouter);
 
 });*/
 
+//sisselogitud kasutaja fotod
+const profiilRouter = require("./routes/profiilRoutes");
+app.use("/profiil", profiilRouter);
+
 //galerii fotode ülesalaadimine
 const photoupRouter = require("./routes/photoupRoutes");
 app.use("/foto_upload", photoupRouter);
 
 const galleyRouter = require("./routes/galleryRoutes");
 app.use("/photogallery", galleyRouter);
+
+const signupRouter = require("./routes/signupRoutes");
+app.use("/signup", signupRouter);
+
+//sisselogimise marsuudid 
+const signinRouter = require("./routes/signinRoutes");
+app.use("/signin", signinRouter);
+
+
 
 app.listen(5119);

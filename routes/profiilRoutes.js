@@ -8,13 +8,13 @@ router.use(loginCheck.isLogin);
 
 
 //kontrollerid
-const {galleryHome,
-       galleryPage
-} = require("../controllers/galleryController");
+const {profiilHome,
+       profiilPage
+} = require("../controllers/profiilGalleryController");
 
-router.route("/").get(galleryHome);
+router.route("/").get(profiilHome);
 
-router.route("/:page").get(galleryPage); //uued marsuudid mida tahaks lisada lehele, siis peaks need panema kirja kaldkriipus järele
+router.route("/:page").get(profiilPage); //uued marsuudid mida tahaks lisada lehele, siis peaks need panema kirja kaldkriipus järele
 //selge sõnaga autori välja mõledud
 
 module.exports = router;

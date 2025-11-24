@@ -61,7 +61,7 @@ const dbConf = {
 	  conn = await mysql.createConnection(dbConf);
 	  let sqlReq = "INSERT INTO uus (file_name, origname, alttext, privacy, user_id) VALUES(?,?,?,?,?)";
 	  //kuna kasutajakontosid veel ei ole, siis mÃ¤Ã¤rame userid = 1
-	  const userId = 1;
+	  const userId = req.session.userId;
 	  const [result] = await conn.execute(sqlReq, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userId]);
 	  console.log("Salvestati kirje: " + result.insertId);
 	  res.render("foto_upload");

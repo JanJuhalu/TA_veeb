@@ -1,6 +1,9 @@
 const express = require("express");
+const loginCheck = require("../src/checklogin");
 const multer = require("multer");
 const router = express.Router();
+//kõigile marsuutidele lisan vahevara sisselogimise kontrollimiseks
+router.use(loginCheck.isLogin);
 //seadistame vajevara fotode üleslaadimiseks kindlasse kausta
 const uploader = multer({dest: "./public/gallery/orig/"});
 //kontrollerid
