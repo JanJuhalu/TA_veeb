@@ -1,25 +1,30 @@
 const express = require ("express");
+require ("dotenv").config();
 const fs = require ("fs");
 const textRef = "public/txt/vanasõnad.txt";
 const dateET = require("./src/dateTimeET");
 const dbInfo = require("../../vp2025config");
 const loginCheck = require("./src/checklogin");
+const pool = require("./src/dbpool");
 //käivitan js funktsiooni ja annan talle nimeks "app"
 const bodyparser = require("body-parser");
 //SQL andmebaasi moodul
-//const mysql = require("mysql2");
+ //const mysql = require("mysql2");
 //kuna kasutame asünkroonsust, siis importime mysql2/promise mooduli
 const mysql = require("mysql2/promise");
 const session = require("express-session");
 const { hostname } = require("os");
+
 const app = express();
-app.use(session({secret: dbInfo.configData.sessionSecret, saveUninitialized: true, resave: true}));
+app.use(session({secret: process.env.SES_SECRET, saveUninitialized: true, resave: true}));
 //määran veebilehtede mallide renderdamise mootori
 app.set("view engine", "ejs");
 //määran ühe päris kataloogi kättesaadavaks
 app.use(express.static("public"));
 //parsime oäringu URL-i, lipp false, kui ainult tekst ja true, kui muid andmeid ka 
 app.use(bodyparser.urlencoded({extended: true}));
+
+
 
 
 //loon andmebaasi ühenduse
@@ -34,12 +39,13 @@ const dbConf = {
 
 
 app.get("/", async (req, res)=>{
-	let conn;
+	//let conn;
 	try {
-		conn = await mysql.createConnection(dbConf);
+		//conn = await mysql.createConnection(dbConf);
 		let sqlReq = "SELECT file_name, alttext FROM uus WHERE id=(SELECT MAX(id) FROM uus WHERE privacy=? AND deleteit IS NULL)";
 		const privacy = 3;
-		const [rows, fields] = await conn.execute(sqlReq, [privacy]);
+		//const [rows, fields] = await conn.execute(sqlReq, [privacy]); VAID HOOPIS
+        const [rows, fields] = await pool.execute(sqlReq, [privacy]);
 		console.log(rows);
 		let imgAlt = "Avalik foto";
 		if(rows[0].alttext != ""){
@@ -52,12 +58,12 @@ app.get("/", async (req, res)=>{
 		//res.render("index");
 		res.render("index", {imgFile: "images/otsin_pilte.jpg", imgAlt: "Tunnen end, kui pilti otsiv lammas ..."});
 	}
-	finally {
+	/* finally {
 		if(conn){
 			await conn.end();
 			console.log("AndmebaasiÃ¼hendus suletud!");
 		}
-	}
+	} */
 });
 
 //sisseloginud kasutajate osa avaleht
@@ -151,25 +157,25 @@ app.get("/eestiFilm", (req, res)=>{
 });
 
 app.get("/eestiFilm/filmiinimesed", async (req, res)=>{
-    let conn;
+    //let conn;
     const sqlReq = "SELECT * FROM person";
     try {
-        conn = await mysql.createConnection(dbConf);
+        //conn = await mysql.createConnection(dbConf);
         console.log("Andmebaasi ühenuds loodud");
-        const [rows, fields] = await conn.execute(sqlReq);
+        const [rows, fields] = await pool.execute(sqlReq);
         res.render("filmiinimesed", {personList: rows});
     }
     catch(err) {
         console.log("Viga!" + err);
         res.render("filmiinimesed", {personList: []});
     }
-    finally{
+    /* finally{
         //paneme ühenduse kinni
-        if(conn/*connection*/){
+        if(conn){
             await conn.end();
                 console.log("Andmebaasi ühenuds on suletud");
         }
-    }
+    } */
 });
 
 
@@ -179,7 +185,7 @@ app.get("/eestiFilm/filmiinimesed_add", (req, res)=>{
 });
 
 app.post("/eestiFilm/filmiinimesed_add", async (req, res)=> {
-    let conn;
+    //let conn;
     let sqlReq = "INSERT INTO person (first_name, last_name, born, deceased) VALUES (?,?,?,?)";
     
     if(!req.body.firstNameInput || !req.body.lastNameInput || !req.body.bornInput || req.body.deceasedInput >= new Date ()){
@@ -187,13 +193,13 @@ app.post("/eestiFilm/filmiinimesed_add", async (req, res)=> {
     }
     else {
         try {
-            conn = await mysql.createConnection(dbConf);
+            //conn = await mysql.createConnection(dbConf);
             console.log("Andmebaasi ühenuds loodud");
             let deceasedDate = null;
             if (req.body.deceasedInput != ""){
                 deceasedDate = req.body.deceasedInput;
             }
-            const [result] = await conn.execute(sqlReq, [req.body.firstNameInput, req.body.lastNameInput, req.body.bornInput, deceasedDate]);
+            const [result] = await pool.execute(sqlReq, [req.body.firstNameInput, req.body.lastNameInput, req.body.bornInput, deceasedDate]);
             console.log("Salvestati kirje: " + result.insertId);//saame teada äsja lisatud kirje id
             res.render("filmiinimesed_add", {notice:"Andmed salvestatud"});
         }
@@ -201,12 +207,12 @@ app.post("/eestiFilm/filmiinimesed_add", async (req, res)=> {
             console.log("Viga!" + err);
             res.render("filmiinimesed_add", {notice: " Inimese lisamine ebaõnestus"});
         }
-        finally {
-            if(conn/*connection*/){
+        /* finally {
+            if(conn/*connection*//*){/*
             await conn.end();
                 console.log("Andmebaasi ühenuds on suletud");
             }
-        }
+        } */
     }
 });
 

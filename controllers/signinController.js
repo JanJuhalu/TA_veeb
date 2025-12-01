@@ -1,14 +1,14 @@
 const mysql = require("mysql2/promise");
 const argon2 = require("argon2");
-const session = require("express-session");
+const pool = require("../src/dbpool");
 const dbInfo = require("../../../vp2025config");
 
-const dbConf = {
+/* const dbConf = {
     host: dbInfo.configData.host,
     user: dbInfo.configData.user,
     password: dbInfo.configData.passWord,
     database: dbInfo.configData.dataBase
-}
+} */
 
 const signinPage = (req, res) => {
 	res.render("signin", {notice: "Ootan andmeid"});
@@ -17,7 +17,7 @@ const signinPage = (req, res) => {
 //@desc
 
 const signinPagePost = async (req, res)=>{
-	let conn;
+	//let conn;
 	console.log(req.body);
 	//andmete valideerimine
 	if(
@@ -42,10 +42,11 @@ const signinPagePost = async (req, res)=>{
 	// 	return res.render("signup", {notice: notice});
 	// }
 	try {
-        conn = await mysql.createConnection(dbConf);
+        //conn = await mysql.createConnection(dbConf);
         let sqlReq = "SELECT id, password FROM users WHERE email = ?";
 		//kandilised sulud sest on list?
-		const [users] = await conn.execute(sqlReq, [req.body.emailInput]);
+		//const [users] = await conn.execute(sqlReq, [req.body.emailInput]);
+		const [users] = await pool.execute(sqlReq, [req.body.emailInput]);
 		//kas sellise emailiga kasutaja leiti
 		if (users.lenght === 0 ){
 			return res.render("signin", {notice: "Kasutajatunnus ja/või parool on vale!"});
@@ -61,7 +62,8 @@ const signinPagePost = async (req, res)=>{
 			//paneme sessiooni käima ja määrame sessiooni ühe muutuja
 			req.session.userId = user.id; //sessiooni muutuja
 			sqlReq = "SELECT first_name, last_name FROM users WHERE id = ?";
-			const [users] = await conn.execute(sqlReq, [req.session.userId]);
+			//const [users] = await conn.execute(sqlReq, [req.session.userId]);
+			const [users] = await pool.execute(sqlReq, [req.session.userId]);
 			req.session.firstName = users[0].first_name;
 			req.session.lastName = users[0].last_name;
 			return res.redirect ("/home");
@@ -77,11 +79,11 @@ const signinPagePost = async (req, res)=>{
     } catch (error) {
         console.log(error);
         res.render("signin", {notice: "Tekkis viga"});
-    } finally {
-      if (conn) {
+    }  /*finally {
+       if (conn) {
         await conn.end();
       }  
-    }
+    }  */
     
 };
 

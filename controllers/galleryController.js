@@ -1,12 +1,13 @@
 const mysql = require("mysql2/promise");
+const dbpool = reuire("../src/dbpool");
 const dbInfo = require("../../../vp2025config");
 
-const dbConf = {
+/* const dbConf = {
     host: dbInfo.configData.host,
     user: dbInfo.configData.user,
     password: dbInfo.configData.passWord,
     database: dbInfo.configData.dataBase
-}
+} */
 
 const galleryHome = async (req, res)=>{
 
@@ -15,7 +16,7 @@ res.redirect("/photogallery/1")};
 
 
 const galleryPage = async (req, res)=>{
-	let conn;
+	//let conn;
 	const photoLimit = 3;
 	const privacy = 2;
 	let page = parseInt(req.params.page); //PARAMEETRID
@@ -27,10 +28,10 @@ const galleryPage = async (req, res)=>{
 		if(page < 1 || isNaN(page)){
 			page = 1;
 		};
-		conn = await mysql.createConnection(dbConf);
+		//conn = await mysql.createConnection(dbConf);
 		//vaatame palju üldse fotosid on
 		let sqlReq = "SELECT COUNT(id) AS photos FROM uus WHERE privacy >= ? AND deleteit IS NULL";
-		const [countResult] = await conn.execute(sqlReq, [privacy]);
+		const [countResult] = await pool.execute(sqlReq, [privacy]);
 		const photoCount = countResult[0].photos;
 		console.log(photoCount);
 		//parandame leheküljenumbri, kui see on valitud liiga suur
@@ -54,7 +55,7 @@ const galleryPage = async (req, res)=>{
 
 
 		sqlReq = "SELECT file_name, alttext FROM uus WHERE privacy >= ? AND deleteit IS NULL LIMIT ?, ?";
-		const [rows, fields] = await conn.execute(sqlReq, [privacy, skip, photoLimit]);
+		const [rows, fields] = await pool.execute(sqlReq, [privacy, skip, photoLimit]);
 		console.log(rows);
 		let listData = [];
 		for (let i = 0; i < rows.length; i ++){
@@ -72,11 +73,11 @@ const galleryPage = async (req, res)=>{
 		console.log(err);
 		res.render("gallery", {galleryData: [], links: ""});
 	}
-	finally {
+	/* finally {
 	  if(conn){
 	    await conn.end();
 	  }
-	}
+	} */
 };
 
 module.exports = {

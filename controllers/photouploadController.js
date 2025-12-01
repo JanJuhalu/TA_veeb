@@ -1,15 +1,15 @@
 const mysql = require("mysql2/promise");
 const fs = require("fs").promises;
 const sharp = require("sharp");
-const dbInfo = require("../../../vp2025config");
+const dbpool = reuire("../src/dbpool");
 const watermarkFile = ("./public/image/vp_logo_small.png");
 
-const dbConf = {
+/* const dbConf = {
     host: dbInfo.configData.host,
     user: dbInfo.configData.user,
     password: dbInfo.configData.passWord,
     database: dbInfo.configData.dataBase
-}
+} */
 
 //@desc home page for uploading gallery photos
 //@route GET /galleryphotoupload
@@ -30,7 +30,7 @@ const dbConf = {
 
 //app.get("/eestiFilm/filmiinimesed_add", (req, res)=>{
     const photouploadPagePost = async (req, res)=>{
-    let conn;
+    //let conn;
     console.log(req.body);
     console.log(req.file);
     try {
@@ -58,11 +58,11 @@ const dbConf = {
 		await normalImageProcessor.toFile("./public/gallery/normal/" + fileName);
 	  //loon thumbnail pildi 100X100
 	  await sharp(req.file.destination + fileName).resize(100,100).jpeg({quality: 90}).toFile("./public/gallery/thumbs/" + fileName);
-	  conn = await mysql.createConnection(dbConf);
+	  //conn = await mysql.createConnection(dbConf);
 	  let sqlReq = "INSERT INTO uus (file_name, origname, alttext, privacy, user_id) VALUES(?,?,?,?,?)";
 	  //kuna kasutajakontosid veel ei ole, siis mÃ¤Ã¤rame userid = 1
 	  const userId = req.session.userId;
-	  const [result] = await conn.execute(sqlReq, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userId]);
+	  const [result] = await pool.execute(sqlReq, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userId]);
 	  console.log("Salvestati kirje: " + result.insertId);
 	  res.render("foto_upload");
 	}
@@ -70,12 +70,12 @@ const dbConf = {
 	  console.log(err);
 	  res.render("foto_upload");
 	}
-	finally {
+	/* finally {
 	  if(conn){
 	  await conn.end();
 	    console.log("AndmebaasiÃ¼hendus on suletud!");
 	  }
-	}
+	} */
 };
 
 
